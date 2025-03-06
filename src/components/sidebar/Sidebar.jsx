@@ -6,7 +6,6 @@ import ChatList from './chatList/ChatList';
 const Sidebar = () => {
     return (
         <div className='sidebar'>
-            Sidebar
             <PersonalInfo/>
             <ChatList/>
         </div>
