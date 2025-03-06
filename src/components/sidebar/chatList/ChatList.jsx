@@ -3,7 +3,7 @@ import "./chatList.css"
 
 const ChatList = () => {
     return (
-        <div>
+        <div className='chatList'>
             - ChatList
         </div>
     );

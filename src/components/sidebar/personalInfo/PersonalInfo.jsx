@@ -1,12 +1,13 @@
-import React from 'react';
-import "./personalInfo.css"
+import React from "react";
+import "./personalInfo.css";
+
 
 const PersonalInfo = () => {
-    return (
-        <div>
-            - PersonalInfo
-        </div>
-    );
-}
+  return (
+    <div className="personalInfo">
+        - PersonalInfo
+    </div>
+  );
+};
 
 export default PersonalInfo;
