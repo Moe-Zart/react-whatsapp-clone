@@ -1,4 +1,7 @@
 .sidebar{
     flex:3;
-    overflow: hidden;
+    overflow: scroll;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color:#ffffff15 rgba(16, 19, 19, 0.3);
 }
