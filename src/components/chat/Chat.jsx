@@ -1,16 +1,25 @@
-import React from "react";
+import React, {useState, useRef, useEffect } from "react";
 import "./chat.css";
 import EmojiPicker from "emoji-picker-react";
-import { useState } from "react";
+import Details from "./details/Details";
+import "./details/details.css"
 
 const Chat = () => {
   const [popup, setPopup] = useState(false);
   const [text, setText] = useState("");
+  const [showDetails, setShowDetails] = useState(false); // Toggle dropdown
+
+  const endRef = useRef(null);
+
+  useEffect(()=> {
+    endRef.current?.scrollIntoView({behavior:"smooth"})
+  })
 
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
     setPopup(false);
   };
+
 
   return (
     <div className="chat">
@@ -25,11 +34,14 @@ const Chat = () => {
         <div className="topIcons">
           <img src="./phone.png" alt="" />
           <img src="./video.png" alt="" />
-          <img src="./info.png" alt="" />
+          <img src="./info.png" onClick={() => setShowDetails((prev) => !prev)} // Toggle dropdown
+            className="detailsIcon" alt="" />
         </div>
       </div>
-
-      <div className="center">
+      <div className={`detailsContainer scroll ${showDetails ? "show" : ""}`}>
+        <Details />
+      </div>
+      <div className="center scroll">
         <div className="message personal">
           <div className="messageContent">
             <p>
@@ -56,6 +68,7 @@ const Chat = () => {
             <span>1 min ago</span>
           </div>
         </div>
+        <div ref={endRef}></div>
       </div>
 
       <div className="bottom">

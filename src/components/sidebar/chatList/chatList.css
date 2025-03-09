@@ -6,6 +6,9 @@
   align-items: center;
   gap: 20px;
   padding: 20px;
+  position: sticky;
+  top:90px;
+  background-color: rgb(13, 24, 25);
 }
 .searchBar {
   flex: 1;
