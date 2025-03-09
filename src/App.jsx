@@ -1,11 +1,13 @@
 import Chat from "./components/chat/Chat";
+import Login from "./components/login/Login";
 import Sidebar from "./components/sidebar/Sidebar";
 
 function App() {
+  const user = false;
+
   return (
     <div className="container">
-      <Sidebar/>
-      <Chat/>
+      {user ? (<><Sidebar /><Chat /></>) : (<Login />)}
     </div>
   );
 }
