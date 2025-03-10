@@ -4,7 +4,7 @@ import Notification from "./components/notification/Notification";
 import Sidebar from "./components/sidebar/Sidebar";
 
 function App() {
-  const user = true;
+  const user = false;
 
   return (
     <div className="container">
