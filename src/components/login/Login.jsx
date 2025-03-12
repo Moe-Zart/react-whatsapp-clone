@@ -4,12 +4,22 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
 import { doc, setDoc } from "firebase/firestore"; 
 import { toast } from "react-toastify";
+import upload from "../../lib/upload";
 
 const Login = () => {
   const [avatar, setAvatar] = useState({
     file: null,
     url: "",
   });
+
+  const handleAvatar = (e) => {
+    if (e.target.files[0]) {
+      setAvatar({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -23,9 +33,13 @@ const Login = () => {
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
       
+      console.log(avatar.file);
+      const imgURL = await upload(avatar.file);
+      console.log(imgURL);
       await setDoc(doc(db, "users", res.user.uid), {
         username: username,
         email: email,
+        avatar: imgURL,
         blocked:[],
       });
       await setDoc(doc(db, "userchats", res.user.uid), {
@@ -37,14 +51,6 @@ const Login = () => {
     }
   };
 
-  const handleAvatar = (e) => {
-    if (e.target.files[0]) {
-      setAvatar({
-        file: e.target.files[0],
-        url: URL.createObjectURL(e.target.files[0]),
-      });
-    }
-  };
 
   return (
     <div className="login">
