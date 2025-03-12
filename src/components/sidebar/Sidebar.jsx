@@ -8,6 +8,8 @@ const Sidebar = () => {
         <div className='sidebar'>
             <PersonalInfo/>
             <ChatList/>
+            <button className="logout">Log out</button>
+
         </div>
     );
 }
