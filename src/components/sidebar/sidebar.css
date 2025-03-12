@@ -6,3 +6,21 @@
     scrollbar-color:#ffffff15 rgb(13, 24, 25, 0.4);
     z-index: 1;
 }
+
+.logout{
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: rgba(32, 77, 63, 0.2);
+    color: #e74c3c;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout:hover{
+    background-color: rgba(32, 77, 63, 0.233);
+    color: #e74d3cc0;
+}

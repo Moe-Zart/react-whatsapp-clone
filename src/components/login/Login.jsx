@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./login.css";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../lib/firebase";
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import upload from "../../lib/upload";
 
@@ -11,7 +11,7 @@ const Login = () => {
     file: null,
     url: "",
   });
-
+  const [loading, setLoading] = useState(false);
   const handleAvatar = (e) => {
     if (e.target.files[0]) {
       setAvatar({
@@ -23,7 +23,7 @@ const Login = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     const formData = new FormData(e.target);
 
     const { username, email, password } = Object.fromEntries(formData);
@@ -32,7 +32,7 @@ const Login = () => {
       return toast.warn("Please enter inputs!");
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       console.log(avatar.file);
       const imgURL = await upload(avatar.file);
       console.log(imgURL);
@@ -40,7 +40,7 @@ const Login = () => {
         username: username,
         email: email,
         avatar: imgURL,
-        blocked:[],
+        blocked: [],
       });
       await setDoc(doc(db, "userchats", res.user.uid), {
         chats: [],
@@ -48,6 +48,24 @@ const Login = () => {
       toast.success("Account created! You can login now!");
     } catch (err) {
       toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData(e.target);
+    const { email, password } = Object.fromEntries(formData);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+      toast.error("Incorrect email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,10 +74,10 @@ const Login = () => {
     <div className="login">
       <div className="item">
         <h2>Welcome back,</h2>
-        <form>
+        <form onSubmit={handleLogin}>
           <input type="text" placeholder="Email" name="email" />
           <input type="password" placeholder="Password" name="password" />
-          <button>Log In</button>
+          <button disabled={loading}>Log In</button>
         </form>
       </div>
       <div className="separator"></div>
@@ -79,7 +97,7 @@ const Login = () => {
           <input type="text" placeholder="Username" name="username" />
           <input type="text" placeholder="Email" name="email" />
           <input type="password" placeholder="Password" name="password" />
-          <button>Sign Up</button>
+          <button disabled={loading}>Sign Up</button>
         </form>
       </div>
     </div>
