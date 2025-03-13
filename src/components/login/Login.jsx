@@ -27,18 +27,16 @@ const Login = () => {
     const formData = new FormData(e.target);
 
     const { username, email, password } = Object.fromEntries(formData);
-    console.log(username, email, password);
     if (!username || !email || !password)
       return toast.warn("Please enter inputs!");
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      console.log(avatar.file);
       const imgURL = await upload(avatar.file);
-      console.log(imgURL);
       await setDoc(doc(db, "users", res.user.uid), {
         username: username,
         email: email,
+        id: res.user.uid,
         avatar: imgURL,
         blocked: [],
       });

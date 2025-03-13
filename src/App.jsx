@@ -20,7 +20,6 @@ function App() {
     };
   }, [fetchUserInfo]);
 
-  console.log(currentUser)
   return (
     <div className="container">
       {currentUser ? (<><Sidebar /><Chat /></>) : (<Login />)}

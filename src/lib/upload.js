@@ -6,7 +6,6 @@ const upload = async (file) => {
       ID.unique(),
       file
     );
-    console.log(promise.$id);
     const result = storage.getFileDownload('67ce73af001a0830cbe9', promise.$id);
     return result;
 };
