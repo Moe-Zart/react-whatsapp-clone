@@ -11,7 +11,7 @@ const PersonalInfo = () => {
       <div className="icons">
         <img src="./more.png" alt="" />
         <img src="./video.png" alt="" />
-        <img src="./edit.png" alt="" />
+        <img src="./newChat.png" alt="" />
       </div>
     </div>
   );
