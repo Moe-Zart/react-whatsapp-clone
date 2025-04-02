@@ -29,6 +29,8 @@ const Login = () => {
     const { username, email, password } = Object.fromEntries(formData);
     if (!username || !email || !password)
       return toast.warn("Please enter inputs!");
+    if (!avatar.file)
+      return toast.warn("Please upload an avatar!");
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
@@ -38,7 +40,6 @@ const Login = () => {
         email: email,
         id: res.user.uid,
         avatar: imgURL,
-        blocked: [],
       });
       await setDoc(doc(db, "userchats", res.user.uid), {
         chats: [],

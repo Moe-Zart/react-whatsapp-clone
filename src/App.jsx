@@ -6,13 +6,15 @@ import Sidebar from "./components/sidebar/Sidebar";
 import { useEffect } from "react";
 import { auth } from "./lib/firebase";
 import { useUserStore } from "./lib/userStore";
+import { useChatStore } from "./lib/chatStore";
 
 function App() {
-  const { currentUser, fetchUserInfo} = useUserStore();
+  const { currentUser, fetchUserInfo } = useUserStore();
+  const { chatId } = useChatStore();
 
   useEffect(() => {
     const unSub = onAuthStateChanged(auth, (user) => {
-      fetchUserInfo(user?.uid)
+      fetchUserInfo(user?.uid);
     });
 
     return () => {
@@ -22,8 +24,15 @@ function App() {
 
   return (
     <div className="container">
-      {currentUser ? (<><Sidebar /><Chat /></>) : (<Login />)}
-      <Notification/>
+      {currentUser ? (
+        <>
+          <Sidebar />
+          {chatId && <Chat />}
+        </>
+      ) : (
+        <Login />
+      )}
+      <Notification />
     </div>
   );
 }

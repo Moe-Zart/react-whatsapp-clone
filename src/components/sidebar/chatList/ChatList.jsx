@@ -3,10 +3,12 @@ import "./chatList.css";
 import { useUserStore } from "../../../lib/userStore";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
+import { useChatStore } from "../../../lib/chatStore";
 
 const ChatList = () => {
   const [chats,setChats] = useState([]);
   const {currentUser} = useUserStore();
+  const { changeChat} = useChatStore();
 
   useEffect(()=> {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), (doc) => {
@@ -16,7 +18,13 @@ const ChatList = () => {
   return()=>{
     unSub();
   }
+
 },[currentUser.id]);
+
+  const handleSelect = async (chat) =>{
+    changeChat(chat.chatId, chat.user);
+  }
+
   return (
     <div className="chatList">
       <div className="search">
@@ -26,7 +34,7 @@ const ChatList = () => {
         </div>
       </div>
       {chats.map(chat=>(
-        <div className="chatUser"key={chat.chatID}>
+        <div className="chatUser"key={chat.chatID} onClick={() => handleSelect(chat)}>
         <img src={chat.avatar || "./avatar.png"} alt="" />
         <div className="lastMessage">
             <span>{chat.username}</span>

@@ -3,17 +3,32 @@ import "./chat.css";
 import EmojiPicker from "emoji-picker-react";
 import Details from "./details/Details";
 import "./details/details.css"
+import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/chatStore";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const Chat = () => {
   const [popup, setPopup] = useState(false);
   const [text, setText] = useState("");
   const [showDetails, setShowDetails] = useState(false); // Toggle dropdown
+  const [chat, setChat] = useState();
+
+  const { chatId } = useChatStore();
 
   const endRef = useRef(null);
 
   useEffect(()=> {
     endRef.current?.scrollIntoView({behavior:"smooth"})
   })
+  useEffect(() => {
+    const unSub = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+
+    return () => {
+      unSub();
+    };
+  }, [chatId]);
 
   const handleEmoji = (e) => {
     setText((prev) => prev + e.emoji);
@@ -42,32 +57,15 @@ const Chat = () => {
         <Details />
       </div>
       <div className="center scroll">
-        <div className="message personal">
-          <div className="messageContent">
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-            </p>
-            <span>1 min ago</span>
+      {chat?.messages?.map((message) => (
+          <div className="message personal" key={message?.createdAt}>
+            <div className="messageContent">
+              {message.img && <img src={message.img.url} alt="" />}
+              <p>{message.text}</p>
+              {/* <span>{message.createdAt}</span>*/}
+            </div>
           </div>
-        </div>
-        <div className="message">
-          <img src="./avatar.png" alt="" />
-          <div className="messageContent">
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message personal">
-          <div className="messageContent">
-            <img src="https://frontendsimplified.com/_nuxt/img/platform.1d1619c.png" alt="" />
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-            </p>
-            <span>1 min ago</span>
-          </div>
-        </div>
+        ))}
         <div ref={endRef}></div>
       </div>
 
