@@ -7,13 +7,17 @@ import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { useUserStore } from "../../lib/userStore";
+import upload from "../../lib/upload";
 
 const Chat = () => {
   const [popup, setPopup] = useState(false);
   const [text, setText] = useState("");
   const [showDetails, setShowDetails] = useState(false); // Toggle dropdown
   const [chat, setChat] = useState();
-
+  const [img, setImg] = useState({
+    file: null,
+    url: "",
+  });
   const { currentUser } = useUserStore();
   const { chatId } = useChatStore();
 
@@ -36,16 +40,27 @@ const Chat = () => {
     setText((prev) => prev + e.emoji);
     setPopup(false);
   };
-  
+  const handleImg = (e) => {
+    if (e.target.files[0]) {
+      setImg({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
     const handleSend = async () => {
       if (text === "") return;
-    
+      let imgUrl = null;    
       try {
+        if (img.file) {
+          imgUrl = await upload(img.file);
+        }
         await updateDoc(doc(db, "chats", chatId), {
           messages: arrayUnion({
             senderId: currentUser.id,
             text,
             createdAt: new Date(),
+            ...(imgUrl && { img: imgUrl }),
           }),
         });
         const userChatsRef = doc(db, "userchats", currentUser.id);
@@ -80,7 +95,15 @@ const Chat = () => {
         });
       } catch (err) {
         console.log(err);
-      } 
+      }
+      finally{
+        setImg({
+          file: null,
+          url: "",
+        });
+    
+        setText("");
+        } 
     };
 
 
@@ -106,20 +129,35 @@ const Chat = () => {
       </div>
       <div className="center scroll">
       {chat?.messages?.map((message) => (
-          <div className="message personal" key={message?.createdAt}>
+          <div className={message.senderId === currentUser?.id ? "message personal" : "message"} key={message?.createdAt}>
             <div className="messageContent">
-              {message.img && <img src={message.img.url} alt="" />}
+              {message.img && <img src={message.img} alt="" />}
               <p>{message.text}</p>
               {/* <span>{message.createdAt}</span>*/}
             </div>
           </div>
         ))}
+        {img.url && (
+          <div className="message personal">
+            <div className="messageContent">
+              <img src={img.url} alt="" />
+            </div>
+          </div>
+        )}        
         <div ref={endRef}></div>
       </div>
 
       <div className="bottom">
         <div className="bottomIcons">
-          <img src="./img.png" alt="" />
+        <label htmlFor="file">
+            <img src="./img.png" alt="" />
+          </label>
+          <input
+            type="file"
+            id="file"
+            style={{ display: "none" }}
+            onChange={handleImg}
+          />          
           <img src="./camera.png" alt="" />
           <img src="./mic.png" alt="" />
         </div>
