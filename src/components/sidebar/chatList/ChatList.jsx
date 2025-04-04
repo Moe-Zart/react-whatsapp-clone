@@ -8,7 +8,7 @@ import { useChatStore } from "../../../lib/chatStore";
 const ChatList = () => {
   const [chats,setChats] = useState([]);
   const {currentUser} = useUserStore();
-  const { changeChat} = useChatStore();
+  const { chatId, changeChat} = useChatStore();
 
   useEffect(()=> {
     const unSub = onSnapshot(doc(db, "userchats", currentUser.id), (doc) => {
@@ -34,7 +34,7 @@ const ChatList = () => {
         </div>
       </div>
       {chats.map(chat=>(
-        <div className="chatUser"key={chat.chatID} onClick={() => handleSelect(chat)}>
+        <div className={`chatUser ${chatId === chat.chatId ? "selectedChat" : ""}`} key={chat.chatID} onClick={() => handleSelect(chat)}>
         <img src={chat.avatar || "./avatar.png"} alt="" />
         <div className="lastMessage">
             <span>{chat.username}</span>

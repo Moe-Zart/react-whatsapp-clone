@@ -5,7 +5,8 @@ import Details from "./details/Details";
 import "./details/details.css"
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
-import { doc, onSnapshot } from "firebase/firestore";
+import { arrayUnion, doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { useUserStore } from "../../lib/userStore";
 
 const Chat = () => {
   const [popup, setPopup] = useState(false);
@@ -13,6 +14,7 @@ const Chat = () => {
   const [showDetails, setShowDetails] = useState(false); // Toggle dropdown
   const [chat, setChat] = useState();
 
+  const { currentUser } = useUserStore();
   const { chatId } = useChatStore();
 
   const endRef = useRef(null);
@@ -34,6 +36,52 @@ const Chat = () => {
     setText((prev) => prev + e.emoji);
     setPopup(false);
   };
+  
+    const handleSend = async () => {
+      if (text === "") return;
+    
+      try {
+        await updateDoc(doc(db, "chats", chatId), {
+          messages: arrayUnion({
+            senderId: currentUser.id,
+            text,
+            createdAt: new Date(),
+          }),
+        });
+        const userChatsRef = doc(db, "userchats", currentUser.id);
+        const userChatsSnapshot = await getDoc(userChatsRef);
+        const userChatsData = userChatsSnapshot.data();
+    
+        const chatIndex = userChatsData.chats.findIndex(
+          (c) => c.chatId === chatId
+        );
+    
+        const receiverId = userChatsData.chats[chatIndex].receiverId;
+    
+        const userIDs = [currentUser.id, receiverId];
+        userIDs.forEach(async (id) => {
+          const userChatsRef = doc(db, "userchats", id);
+          const userChatsSnapshot = await getDoc(userChatsRef);
+  
+          if (userChatsSnapshot.exists()) {
+            const userChatsData = userChatsSnapshot.data();
+  
+            const chatIndex = userChatsData.chats.findIndex(
+              (c) => c.chatId === chatId
+            );
+  
+            userChatsData.chats[chatIndex].lastMessage = text;
+            userChatsData.chats[chatIndex].updatedAt = Date.now();
+  
+            await updateDoc(userChatsRef, {
+              chats: userChatsData.chats,
+            });
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      } 
+    };
 
 
   return (
@@ -91,7 +139,7 @@ const Chat = () => {
             <EmojiPicker open={popup} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="sendButton">Send</button>
+        <button className="sendButton" onClick={handleSend}>Send</button>
       </div>
     </div>
   );
